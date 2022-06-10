@@ -29,4 +29,30 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             }
         }
     }
+
+    public class RewardAdObject
+    {
+        public AdPlacement.Type adPlacementType;
+        public RewardDelegate onAdLoaded;
+        public RewardDelegate onAdClosed;
+        public AdObjectState state;
+
+        public RewardAdObject()
+        {
+        }
+
+        public RewardAdObject(AdPlacement.Type adPlacementType, RewardDelegate onAdClosed)
+        {
+            this.adPlacementType = adPlacementType;
+            this.onAdClosed = onAdClosed;
+        }
+
+        public bool CanShow
+        {
+            get
+            {
+                return state == AdObjectState.Ready;
+            }
+        }
+    }
 }

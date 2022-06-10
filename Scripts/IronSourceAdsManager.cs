@@ -10,7 +10,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         None = 0, Loading, Ready, Showing, Shown, Closed, LoadFailed, ShowFailed
     }
 
-    public class IronSourceAdsManager : MonoBehaviour, IAdsNetworkHelper
+    public partial class IronSourceAdsManager : MonoBehaviour, IAdsNetworkHelper
     {
         bool initialized = false;
         InterstitialAdObject currentInterstitialAd;
@@ -56,6 +56,9 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             IronSourceEvents.onInterstitialAdClickedEvent += InterstitialAdClickedEvent;
             IronSourceEvents.onInterstitialAdOpenedEvent += InterstitialAdOpenedEvent;
             IronSourceEvents.onInterstitialAdClosedEvent += InterstitialAdClosedEvent;
+
+            InitRewardAdCallbacks();
+
             initialized = true;
         }
 
@@ -207,11 +210,6 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         }
 
         public void ShowInterstitialRewarded(AdPlacement.Type placementType, RewardDelegate onAdClosed)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Reward(AdPlacement.Type placementType, RewardDelegate onFinish)
         {
             throw new System.NotImplementedException();
         }
