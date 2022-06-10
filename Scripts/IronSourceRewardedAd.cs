@@ -99,6 +99,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             QueueMainThreadExecution(() =>
             {
                 GetCurrentRewardAd().onAdClosed?.Invoke(new RewardResult(RewardResult.Type.Finished));
+                GetCurrentRewardAd().state = AdObjectState.Shown;
                 onRewardedVideoAdRewardedEvent?.Invoke(GetCurrentRewardAd().adPlacementType, iSPlacement);
             });
         }
@@ -108,6 +109,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             QueueMainThreadExecution(() =>
             {
                 GetCurrentRewardAd().onAdClosed?.Invoke(new RewardResult(RewardResult.Type.Canceled, "Show failed"));
+                GetCurrentRewardAd().state = AdObjectState.ShowFailed;
                 onRewardedVideoAdShowFailedEvent?.Invoke(GetCurrentRewardAd().adPlacementType, iSPlacement);
             });
         }
@@ -141,6 +143,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 
             if (IronSource.Agent.isRewardedVideoAvailable())
             {
+                GetCurrentRewardAd().state = AdObjectState.Showing;
                 IronSource.Agent.showRewardedVideo(IronSourceAdID.GetAdID(placementType));
             }
             else
