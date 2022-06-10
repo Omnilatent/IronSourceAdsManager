@@ -7,7 +7,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 {
     public enum AdObjectState
     {
-        None = 0, Loading, Ready, Shown, LoadFailed, ShowFailed
+        None = 0, Loading, Ready, Showing, Shown, Closed, LoadFailed, ShowFailed
     }
 
     public class IronSourceAdsManager : MonoBehaviour, IAdsNetworkHelper
@@ -99,7 +99,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                GetCurrentInterAd().ready = true;
+                GetCurrentInterAd().state = AdObjectState.Ready;
                 GetCurrentInterAd().onAdLoaded?.Invoke(true);
                 onInterstitialAdReadyEvent?.Invoke(GetCurrentInterAd().adPlacementType);
                 Debug.Log($"Iron source ad ready {GetCurrentInterAd().adPlacementType}");
@@ -110,7 +110,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                GetCurrentInterAd().ready = false;
+                GetCurrentInterAd().state = AdObjectState.LoadFailed;
                 GetCurrentInterAd().onAdLoaded?.Invoke(false);
                 onInterstitialAdLoadFailedEvent?.Invoke(GetCurrentInterAd().adPlacementType, error);
             });
@@ -120,6 +120,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
+                GetCurrentInterAd().state = AdObjectState.Shown;
                 onInterstitialAdShowSucceededEvent?.Invoke(GetCurrentInterAd().adPlacementType);
             });
         }
@@ -128,6 +129,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
+                GetCurrentInterAd().state = AdObjectState.ShowFailed;
                 onInterstitialAdShowFailedEvent?.Invoke(GetCurrentInterAd().adPlacementType, error);
             });
         }
@@ -152,6 +154,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
+                GetCurrentInterAd().state = AdObjectState.Closed;
                 GetCurrentInterAd().onAdClosed?.Invoke(true);
                 onInterstitialAdClosedEvent?.Invoke(GetCurrentInterAd().adPlacementType);
             });
@@ -177,7 +180,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 string placementName = IronSourceAdID.GetAdID(placementType);
                 currentInterstitialAd.onAdClosed = onAdClosed;
                 IronSource.Agent.showInterstitial(placementName);
-                currentInterstitialAd.shown = true;
+                currentInterstitialAd.state = AdObjectState.Showing;
                 return;
             }
             onAdClosed?.Invoke(false);

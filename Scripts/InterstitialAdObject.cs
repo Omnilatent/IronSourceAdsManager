@@ -9,8 +9,6 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         public AdPlacement.Type adPlacementType;
         public AdsManager.InterstitialDelegate onAdLoaded;
         public AdsManager.InterstitialDelegate onAdClosed;
-        public bool ready;
-        public bool shown; //each ad is only shown once
         public AdObjectState state;
 
         public InterstitialAdObject()
@@ -23,6 +21,12 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             this.onAdLoaded = onAdLoaded;
         }
 
-        public bool CanShow { get => ready && !shown; }
+        public bool CanShow
+        {
+            get
+            {
+                return state == AdObjectState.Ready;
+            }
+        }
     }
 }
