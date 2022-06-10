@@ -5,19 +5,38 @@ using UnityEngine;
 
 namespace Omnilatent.AdsMediation.IronSourceHelper
 {
+    public enum AdObjectState
+    {
+        None = 0, Loading, Ready, Shown, LoadFailed, ShowFailed
+    }
+
     public class IronSourceAdsManager : MonoBehaviour, IAdsNetworkHelper
     {
         bool initialized = false;
         InterstitialAdObject currentInterstitialAd;
 
-        public Action<AdPlacement.Type> onInterstitialAdReadyEvent;
-        public Action<AdPlacement.Type, IronSourceError> onInterstitialAdLoadFailedEvent;
-        public Action<AdPlacement.Type> onInterstitialAdShowSucceededEvent;
-        public Action<AdPlacement.Type, IronSourceError> onInterstitialAdShowFailedEvent;
-        public Action<AdPlacement.Type> onInterstitialAdClickedEvent;
-        public Action<AdPlacement.Type> onInterstitialAdOpenedEvent;
-        public Action<AdPlacement.Type> onInterstitialAdClosedEvent;
+        public static Action<AdPlacement.Type> onInterstitialAdReadyEvent;
+        public static Action<AdPlacement.Type, IronSourceError> onInterstitialAdLoadFailedEvent;
+        public static Action<AdPlacement.Type> onInterstitialAdShowSucceededEvent;
+        public static Action<AdPlacement.Type, IronSourceError> onInterstitialAdShowFailedEvent;
+        public static Action<AdPlacement.Type> onInterstitialAdClickedEvent;
+        public static Action<AdPlacement.Type> onInterstitialAdOpenedEvent;
+        public static Action<AdPlacement.Type> onInterstitialAdClosedEvent;
 
+        static IronSourceAdsManager instance;
+
+        private void Awake()
+        {
+            if (instance == null)
+            {
+                instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (instance != this)
+            {
+                Destroy(gameObject);
+            }
+        }
 
         private void Start()
         {
@@ -50,38 +69,28 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 #elif UNITY_IOS
         string appKey = developerSettings.IOSAppKey;
 #endif
-                if (developerSettings.EnableIronsourceSDKInitAPI == true)
+                if (appKey.Equals(string.Empty))
                 {
-                    if (appKey.Equals(string.Empty))
-                    {
-                        Debug.LogWarning("IronSourceInitilizer Cannot init without AppKey");
-                    }
-                    else
-                    {
-                        IronSource.Agent.init(appKey);
-                        IronSource.UNITY_PLUGIN_VERSION = "7.2.1-ri";
-                    }
-
+                    Debug.LogWarning("IronSourceInitilizer Cannot init without AppKey");
                 }
-
-                if (developerSettings.EnableAdapterDebug)
+                else
                 {
-                    IronSource.Agent.setAdaptersDebug(true);
-                }
-
-                if (developerSettings.EnableIntegrationHelper)
-                {
-                    IronSource.Agent.validateIntegration();
+                    IronSource.Agent.init(appKey);
+                    IronSource.UNITY_PLUGIN_VERSION = "7.2.1-ri";
                 }
             }
         }
 
-        InterstitialAdObject GetCurrentInterAd()
+        InterstitialAdObject GetCurrentInterAd(bool makeNewIfNull = true)
         {
             if (currentInterstitialAd == null)
             {
-                Debug.LogError("currentInterstitialAd is null, this is not supposed to happen. New ad will be created");
-                currentInterstitialAd = new InterstitialAdObject();
+                Debug.LogError("currentInterstitialAd is null.");
+                if (makeNewIfNull)
+                {
+                    Debug.Log("New ad will be created");
+                    currentInterstitialAd = new InterstitialAdObject();
+                }
             }
             return currentInterstitialAd;
         }
@@ -92,6 +101,8 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             {
                 GetCurrentInterAd().ready = true;
                 GetCurrentInterAd().onAdLoaded?.Invoke(true);
+                onInterstitialAdReadyEvent?.Invoke(GetCurrentInterAd().adPlacementType);
+                Debug.Log($"Iron source ad ready {GetCurrentInterAd().adPlacementType}");
             });
         }
 
@@ -101,6 +112,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             {
                 GetCurrentInterAd().ready = false;
                 GetCurrentInterAd().onAdLoaded?.Invoke(false);
+                onInterstitialAdLoadFailedEvent?.Invoke(GetCurrentInterAd().adPlacementType, error);
             });
         }
 
@@ -141,12 +153,14 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             QueueMainThreadExecution(() =>
             {
                 GetCurrentInterAd().onAdClosed?.Invoke(true);
+                onInterstitialAdClosedEvent?.Invoke(GetCurrentInterAd().adPlacementType);
             });
         }
 
         public void RequestInterstitialNoShow(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdLoaded = null, bool showLoading = true)
         {
-            if (currentInterstitialAd != null && currentInterstitialAd.ready)
+            Debug.Log($"Iron source request ad {placementType}");
+            if (currentInterstitialAd != null && currentInterstitialAd.CanShow)
             {
                 onAdLoaded?.Invoke(true);
                 return;
@@ -157,11 +171,13 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 
         public void ShowInterstitial(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdClosed)
         {
-            if (currentInterstitialAd != null && currentInterstitialAd.ready)
+            Debug.Log($"Iron source show ad {placementType}");
+            if (currentInterstitialAd != null && currentInterstitialAd.CanShow)
             {
                 string placementName = IronSourceAdID.GetAdID(placementType);
                 currentInterstitialAd.onAdClosed = onAdClosed;
                 IronSource.Agent.showInterstitial(placementName);
+                currentInterstitialAd.shown = true;
                 return;
             }
             onAdClosed?.Invoke(false);
@@ -170,10 +186,9 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 
 
 
-
-        public void RequestAppOpenAd(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdLoaded = null)
+        public void RequestAppOpenAd(AdPlacement.Type placementType, RewardDelegate onAdLoaded = null)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void ShowAppOpenAd(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdClosed = null)
