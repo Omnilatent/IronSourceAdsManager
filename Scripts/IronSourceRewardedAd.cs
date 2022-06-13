@@ -20,18 +20,6 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         public static Action<AdPlacement.Type, IronSourcePlacement> onRewardedVideoAdRewardedEvent;
         public static Action<AdPlacement.Type, IronSourceError> onRewardedVideoAdShowFailedEvent;
 
-        void InitRewardAdCallbacks()
-        {
-            IronSourceEvents.onRewardedVideoAdOpenedEvent += RewardedVideoAdOpenedEvent;
-            IronSourceEvents.onRewardedVideoAdClickedEvent += RewardedVideoAdClickedEvent;
-            IronSourceEvents.onRewardedVideoAdClosedEvent += RewardedVideoAdClosedEvent;
-            IronSourceEvents.onRewardedVideoAvailabilityChangedEvent += RewardedVideoAvailabilityChangedEvent;
-            IronSourceEvents.onRewardedVideoAdStartedEvent += RewardedVideoAdStartedEvent;
-            IronSourceEvents.onRewardedVideoAdEndedEvent += RewardedVideoAdEndedEvent;
-            IronSourceEvents.onRewardedVideoAdRewardedEvent += RewardedVideoAdRewardedEvent;
-            IronSourceEvents.onRewardedVideoAdShowFailedEvent += RewardedVideoAdShowFailed;
-        }
-
         RewardAdObject GetCurrentRewardAd(bool makeNewIfNull = true)
         {
             if (currentRewardAd == null)
@@ -44,6 +32,58 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 }
             }
             return currentRewardAd;
+        }
+        
+        public void Reward(AdPlacement.Type placementType, RewardDelegate onFinish)
+        {
+            currentRewardAd = new RewardAdObject(placementType, onFinish);
+            StartCoroutine(CoReward(placementType, onFinish));
+        }
+
+        IEnumerator CoReward(AdPlacement.Type placementType, RewardDelegate onFinish)
+        {
+            float _timeoutRequestAds = TIMEOUT_LOADREWARDAD;
+
+            GetCurrentRewardAd().state = AdObjectState.Loading;
+
+            float retryInterval = 0.4f;
+            WaitForSecondsRealtime delay = new WaitForSecondsRealtime(retryInterval);
+            int tryTimes = 0;
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+            {
+                Debug.Log("IronSource ad not reachable " + Application.internetReachability);
+                _timeoutRequestAds = 3f;
+            }
+            while (!IronSource.Agent.isRewardedVideoAvailable() && tryTimes < _timeoutRequestAds / retryInterval)
+            {
+                yield return delay;
+                tryTimes++;
+            }
+            Debug.Log("IronSource reward ad available:" + IronSource.Agent.isRewardedVideoAvailable());
+
+            if (IronSource.Agent.isRewardedVideoAvailable())
+            {
+                GetCurrentRewardAd().state = AdObjectState.Showing;
+                IronSource.Agent.showRewardedVideo(IronSourceAdID.GetAdID(placementType));
+            }
+            else
+            {
+                onFinish?.Invoke(new RewardResult(RewardResult.Type.LoadFailed, "Self timeout"));
+            }
+            //if (showLoading)
+            //    Manager.LoadingAnimation(false);
+        }
+
+        void InitRewardAdCallbacks()
+        {
+            IronSourceEvents.onRewardedVideoAdOpenedEvent += RewardedVideoAdOpenedEvent;
+            IronSourceEvents.onRewardedVideoAdClickedEvent += RewardedVideoAdClickedEvent;
+            IronSourceEvents.onRewardedVideoAdClosedEvent += RewardedVideoAdClosedEvent;
+            IronSourceEvents.onRewardedVideoAvailabilityChangedEvent += RewardedVideoAvailabilityChangedEvent;
+            IronSourceEvents.onRewardedVideoAdStartedEvent += RewardedVideoAdStartedEvent;
+            IronSourceEvents.onRewardedVideoAdEndedEvent += RewardedVideoAdEndedEvent;
+            IronSourceEvents.onRewardedVideoAdRewardedEvent += RewardedVideoAdRewardedEvent;
+            IronSourceEvents.onRewardedVideoAdShowFailedEvent += RewardedVideoAdShowFailed;
         }
 
         private void RewardedVideoAdOpenedEvent()
@@ -112,46 +152,6 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 GetCurrentRewardAd().state = AdObjectState.ShowFailed;
                 onRewardedVideoAdShowFailedEvent?.Invoke(GetCurrentRewardAd().adPlacementType, iSPlacement);
             });
-        }
-
-        public void Reward(AdPlacement.Type placementType, RewardDelegate onFinish)
-        {
-            currentRewardAd = new RewardAdObject(placementType, onFinish);
-            StartCoroutine(CoReward(placementType, onFinish));
-        }
-
-        IEnumerator CoReward(AdPlacement.Type placementType, RewardDelegate onFinish)
-        {
-            float _timeoutRequestAds = TIMEOUT_LOADREWARDAD;
-
-            GetCurrentRewardAd().state = AdObjectState.Loading;
-
-            float retryInterval = 0.4f;
-            WaitForSecondsRealtime delay = new WaitForSecondsRealtime(retryInterval);
-            int tryTimes = 0;
-            if (Application.internetReachability == NetworkReachability.NotReachable)
-            {
-                Debug.Log("IronSource ad not reachable " + Application.internetReachability);
-                _timeoutRequestAds = 3f;
-            }
-            while (!IronSource.Agent.isRewardedVideoAvailable() && tryTimes < _timeoutRequestAds / retryInterval)
-            {
-                yield return delay;
-                tryTimes++;
-            }
-            Debug.Log("IronSource reward ad available:" + IronSource.Agent.isRewardedVideoAvailable());
-
-            if (IronSource.Agent.isRewardedVideoAvailable())
-            {
-                GetCurrentRewardAd().state = AdObjectState.Showing;
-                IronSource.Agent.showRewardedVideo(IronSourceAdID.GetAdID(placementType));
-            }
-            else
-            {
-                onFinish?.Invoke(new RewardResult(RewardResult.Type.LoadFailed, "Self timeout"));
-            }
-            //if (showLoading)
-            //    Manager.LoadingAnimation(false);
         }
 
         /*IEnumerator CoWaitCachedRewardedAdLoad(AdPlacement.Type placementType, RewardDelegate onFinish)

@@ -99,6 +99,32 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             return currentInterstitialAd;
         }
 
+        public void RequestInterstitialNoShow(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdLoaded = null, bool showLoading = true)
+        {
+            Debug.Log($"Iron source request ad {placementType}");
+            if (currentInterstitialAd != null && currentInterstitialAd.CanShow)
+            {
+                onAdLoaded?.Invoke(true);
+                return;
+            }
+            currentInterstitialAd = new InterstitialAdObject(placementType, onAdLoaded);
+            IronSource.Agent.loadInterstitial();
+        }
+
+        public void ShowInterstitial(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdClosed)
+        {
+            Debug.Log($"Iron source show ad {placementType}");
+            if (currentInterstitialAd != null && currentInterstitialAd.CanShow)
+            {
+                string placementName = IronSourceAdID.GetAdID(placementType);
+                currentInterstitialAd.onAdClosed = onAdClosed;
+                IronSource.Agent.showInterstitial(placementName);
+                currentInterstitialAd.state = AdObjectState.Showing;
+                return;
+            }
+            onAdClosed?.Invoke(false);
+        }
+
         private void InterstitialAdReadyEvent()
         {
             QueueMainThreadExecution(() =>
@@ -164,53 +190,24 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             });
         }
 
-        public void RequestInterstitialNoShow(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdLoaded = null, bool showLoading = true)
-        {
-            Debug.Log($"Iron source request ad {placementType}");
-            if (currentInterstitialAd != null && currentInterstitialAd.CanShow)
-            {
-                onAdLoaded?.Invoke(true);
-                return;
-            }
-            currentInterstitialAd = new InterstitialAdObject(placementType, onAdLoaded);
-            IronSource.Agent.loadInterstitial();
-        }
-
-        public void ShowInterstitial(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdClosed)
-        {
-            Debug.Log($"Iron source show ad {placementType}");
-            if (currentInterstitialAd != null && currentInterstitialAd.CanShow)
-            {
-                string placementName = IronSourceAdID.GetAdID(placementType);
-                currentInterstitialAd.onAdClosed = onAdClosed;
-                IronSource.Agent.showInterstitial(placementName);
-                currentInterstitialAd.state = AdObjectState.Showing;
-                return;
-            }
-            onAdClosed?.Invoke(false);
-        }
-
-
-
-
         public void RequestAppOpenAd(AdPlacement.Type placementType, RewardDelegate onAdLoaded = null)
         {
-            throw new NotImplementedException();
+            onAdLoaded?.Invoke(new RewardResult(RewardResult.Type.LoadFailed, "IronSources: App Open Ad not supported"));
         }
 
         public void ShowAppOpenAd(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdClosed = null)
         {
-            throw new System.NotImplementedException();
+            onAdClosed?.Invoke(false);
         }
 
         public void RequestInterstitialRewardedNoShow(AdPlacement.Type placementType, RewardDelegate onAdLoaded = null)
         {
-            throw new System.NotImplementedException();
+            onAdLoaded?.Invoke(new RewardResult(RewardResult.Type.LoadFailed, "IronSources: Interstitial Rewarded not supported"));
         }
 
         public void ShowInterstitialRewarded(AdPlacement.Type placementType, RewardDelegate onAdClosed)
         {
-            throw new System.NotImplementedException();
+            onAdClosed?.Invoke(new RewardResult(RewardResult.Type.LoadFailed, "IronSources: Interstitial Rewarded not supported"));
         }
 
         public static void QueueMainThreadExecution(Action action)
