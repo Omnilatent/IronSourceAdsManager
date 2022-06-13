@@ -58,6 +58,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             IronSourceEvents.onInterstitialAdClosedEvent += InterstitialAdClosedEvent;
 
             InitRewardAdCallbacks();
+            InitBannerCallbacks();
 
             initialized = true;
         }

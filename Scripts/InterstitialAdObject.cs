@@ -60,5 +60,14 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
     {
         public AdPlacement.Type adPlacementType;
         public AdObjectState state;
+
+        public BannerAdObject()
+        {
+        }
+
+        public BannerAdObject(AdPlacement.Type adPlacementType)
+        {
+            this.adPlacementType = adPlacementType;
+        }
     }
 }

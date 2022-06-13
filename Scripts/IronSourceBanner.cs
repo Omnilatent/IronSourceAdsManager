@@ -24,6 +24,40 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             return currentBannerAd;
         }
 
+        public void ShowBanner(AdPlacement.Type placementType, BannerTransform bannerTransform, AdsManager.InterstitialDelegate onAdLoaded = null)
+        {
+            if (currentBannerAd != null && currentBannerAd.adPlacementType == placementType && currentBannerAd.state != AdObjectState.LoadFailed)
+            {
+                if (currentBannerAd.state == AdObjectState.Ready)
+                {
+                    IronSource.Agent.displayBanner();
+                }
+            }
+            else
+            {
+                IronSourceBannerPosition ironSourceBannerPosition = IronSourceBannerPosition.BOTTOM;
+                switch (bannerTransform.adPosition)
+                {
+                    case AdPosition.Top:
+                    case AdPosition.TopLeft:
+                    case AdPosition.TopRight:
+                        ironSourceBannerPosition = IronSourceBannerPosition.TOP;
+                        break;
+                }
+                IronSourceBannerSize ironSourceBannerSize = new IronSourceBannerSize("BANNER");
+                ironSourceBannerSize.SetAdaptive(true);
+                currentBannerAd = new BannerAdObject(placementType);
+                currentBannerAd.state = AdObjectState.Loading;
+                IronSource.Agent.loadBanner(ironSourceBannerSize, ironSourceBannerPosition, IronSourceAdID.GetAdID(placementType));
+            }
+        }
+
+        public void HideBanner()
+        {
+            IronSource.Agent.hideBanner();
+            GetCurrentBannerAd().state = AdObjectState.Ready;
+        }
+
         void InitBannerCallbacks()
         {
             IronSourceEvents.onBannerAdLoadedEvent += BannerAdLoadedEvent;
@@ -47,6 +81,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             QueueMainThreadExecution(() =>
             {
                 onBannerAdLoadFailedEvent?.Invoke(GetCurrentBannerAd().adPlacementType, error);
+                GetCurrentBannerAd().state = AdObjectState.LoadFailed;
             });
         }
 
@@ -69,35 +104,6 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         public void ShowBanner(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdLoaded = null)
         {
             ShowBanner(placementType, new BannerTransform(AdPosition.Bottom), onAdLoaded);
-        }
-
-        public void ShowBanner(AdPlacement.Type placementType, BannerTransform bannerTransform, AdsManager.InterstitialDelegate onAdLoaded = null)
-        {
-            if (currentBannerAd != null && currentBannerAd.adPlacementType == placementType && currentBannerAd.state == AdObjectState.Ready)
-            {
-                IronSource.Agent.displayBanner();
-            }
-            else
-            {
-                IronSourceBannerPosition ironSourceBannerPosition = IronSourceBannerPosition.BOTTOM;
-                switch (bannerTransform.adPosition)
-                {
-                    case AdPosition.Top:
-                    case AdPosition.TopLeft:
-                    case AdPosition.TopRight:
-                        ironSourceBannerPosition = IronSourceBannerPosition.TOP;
-                        break;
-                }
-                IronSourceBannerSize ironSourceBannerSize = new IronSourceBannerSize("BANNER");
-                ironSourceBannerSize.SetAdaptive(true);
-                IronSource.Agent.loadBanner(ironSourceBannerSize, ironSourceBannerPosition, IronSourceAdID.GetAdID(placementType));
-            }
-        }
-
-        public void HideBanner()
-        {
-            IronSource.Agent.hideBanner();
-            GetCurrentBannerAd().state = AdObjectState.Ready;
         }
     }
 }
