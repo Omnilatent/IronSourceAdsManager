@@ -55,4 +55,10 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             }
         }
     }
+
+    public class BannerAdObject
+    {
+        public AdPlacement.Type adPlacementType;
+        public AdObjectState state;
+    }
 }

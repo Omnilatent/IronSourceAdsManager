@@ -202,29 +202,12 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             throw new System.NotImplementedException();
         }
 
-
-
         public void RequestInterstitialRewardedNoShow(AdPlacement.Type placementType, RewardDelegate onAdLoaded = null)
         {
             throw new System.NotImplementedException();
         }
 
         public void ShowInterstitialRewarded(AdPlacement.Type placementType, RewardDelegate onAdClosed)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void ShowBanner(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdLoaded = null)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void ShowBanner(AdPlacement.Type placementType, BannerTransform bannerTransform, AdsManager.InterstitialDelegate onAdLoaded = null)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void HideBanner()
         {
             throw new System.NotImplementedException();
         }
