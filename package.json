@@ -1,7 +1,7 @@
 {
     "name": "com.omnilatent.ironsourcehelper",
     "displayName": "Omni Iron Source Helper Module",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "unity": "2018.1",
     "description": "Module for managing IronSource Ads",
     "keywords": ["ads"],
