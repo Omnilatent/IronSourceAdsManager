@@ -30,11 +30,8 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             else if (instance != this)
             {
                 Destroy(gameObject);
+                return;
             }
-        }
-
-        private void Start()
-        {
             Init();
         }
 
