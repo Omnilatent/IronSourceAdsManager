@@ -44,7 +44,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             float _timeoutRequestAds = TIMEOUT_LOADREWARDAD;
 
-            GetCurrentRewardAd().state = AdObjectState.Loading;
+            GetCurrentRewardAd().State = AdObjectState.Loading;
 
             float retryInterval = 0.4f;
             WaitForSecondsRealtime delay = new WaitForSecondsRealtime(retryInterval);
@@ -63,7 +63,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 
             if (IronSource.Agent.isRewardedVideoAvailable())
             {
-                GetCurrentRewardAd().state = AdObjectState.Showing;
+                GetCurrentRewardAd().State = AdObjectState.Showing;
                 IronSource.Agent.showRewardedVideo(IronSourceAdID.GetAdID(placementType));
             }
             else
@@ -90,7 +90,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                onRewardedVideoAdOpenedEvent?.Invoke(GetCurrentRewardAd().adPlacementType);
+                onRewardedVideoAdOpenedEvent?.Invoke(GetCurrentRewardAd().AdPlacementType);
             });
         }
 
@@ -98,7 +98,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                onRewardedVideoAdClickedEvent?.Invoke(GetCurrentRewardAd().adPlacementType, iSPlacement);
+                onRewardedVideoAdClickedEvent?.Invoke(GetCurrentRewardAd().AdPlacementType, iSPlacement);
             });
         }
 
@@ -106,7 +106,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                onRewardedVideoAdClosedEvent?.Invoke(GetCurrentRewardAd().adPlacementType);
+                onRewardedVideoAdClosedEvent?.Invoke(GetCurrentRewardAd().AdPlacementType);
             });
         }
 
@@ -114,7 +114,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                onRewardedVideoAvailabilityChangedEvent?.Invoke(GetCurrentRewardAd().adPlacementType, ready);
+                onRewardedVideoAvailabilityChangedEvent?.Invoke(GetCurrentRewardAd().AdPlacementType, ready);
             });
         }
 
@@ -122,7 +122,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                onRewardedVideoAdStartedEvent?.Invoke(GetCurrentRewardAd().adPlacementType);
+                onRewardedVideoAdStartedEvent?.Invoke(GetCurrentRewardAd().AdPlacementType);
             });
         }
 
@@ -130,7 +130,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                onRewardedVideoAdEndedEvent?.Invoke(GetCurrentRewardAd().adPlacementType);
+                onRewardedVideoAdEndedEvent?.Invoke(GetCurrentRewardAd().AdPlacementType);
             });
         }
 
@@ -139,8 +139,8 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             QueueMainThreadExecution(() =>
             {
                 GetCurrentRewardAd().onAdClosed?.Invoke(new RewardResult(RewardResult.Type.Finished));
-                GetCurrentRewardAd().state = AdObjectState.Shown;
-                onRewardedVideoAdRewardedEvent?.Invoke(GetCurrentRewardAd().adPlacementType, iSPlacement);
+                GetCurrentRewardAd().State = AdObjectState.Shown;
+                onRewardedVideoAdRewardedEvent?.Invoke(GetCurrentRewardAd().AdPlacementType, iSPlacement);
             });
         }
 
@@ -149,8 +149,8 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             QueueMainThreadExecution(() =>
             {
                 GetCurrentRewardAd().onAdClosed?.Invoke(new RewardResult(RewardResult.Type.Canceled, "Show failed"));
-                GetCurrentRewardAd().state = AdObjectState.ShowFailed;
-                onRewardedVideoAdShowFailedEvent?.Invoke(GetCurrentRewardAd().adPlacementType, iSPlacement);
+                GetCurrentRewardAd().State = AdObjectState.ShowFailed;
+                onRewardedVideoAdShowFailedEvent?.Invoke(GetCurrentRewardAd().AdPlacementType, iSPlacement);
             });
         }
 

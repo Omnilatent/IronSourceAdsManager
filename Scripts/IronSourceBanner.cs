@@ -26,9 +26,9 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 
         public void ShowBanner(AdPlacement.Type placementType, BannerTransform bannerTransform, AdsManager.InterstitialDelegate onAdLoaded = null)
         {
-            if (currentBannerAd != null && currentBannerAd.adPlacementType == placementType && currentBannerAd.state != AdObjectState.LoadFailed)
+            if (currentBannerAd != null && currentBannerAd.AdPlacementType == placementType && currentBannerAd.State != AdObjectState.LoadFailed)
             {
-                if (currentBannerAd.state == AdObjectState.Ready)
+                if (currentBannerAd.State == AdObjectState.Ready)
                 {
                     IronSource.Agent.displayBanner();
                 }
@@ -47,7 +47,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 IronSourceBannerSize ironSourceBannerSize = new IronSourceBannerSize("BANNER");
                 ironSourceBannerSize.SetAdaptive(true);
                 currentBannerAd = new BannerAdObject(placementType);
-                currentBannerAd.state = AdObjectState.Loading;
+                currentBannerAd.State = AdObjectState.Loading;
                 IronSource.Agent.loadBanner(ironSourceBannerSize, ironSourceBannerPosition, IronSourceAdID.GetAdID(placementType));
             }
         }
@@ -55,7 +55,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         public void HideBanner()
         {
             IronSource.Agent.hideBanner();
-            GetCurrentBannerAd().state = AdObjectState.Ready;
+            GetCurrentBannerAd().State = AdObjectState.Ready;
         }
 
         void InitBannerCallbacks()
@@ -72,7 +72,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                GetCurrentBannerAd().state = AdObjectState.Showing;
+                GetCurrentBannerAd().State = AdObjectState.Showing;
             });
         }
 
@@ -80,8 +80,8 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
         {
             QueueMainThreadExecution(() =>
             {
-                onBannerAdLoadFailedEvent?.Invoke(GetCurrentBannerAd().adPlacementType, error);
-                GetCurrentBannerAd().state = AdObjectState.LoadFailed;
+                onBannerAdLoadFailedEvent?.Invoke(GetCurrentBannerAd().AdPlacementType, error);
+                GetCurrentBannerAd().State = AdObjectState.LoadFailed;
             });
         }
 
