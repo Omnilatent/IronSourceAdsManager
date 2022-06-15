@@ -5,11 +5,6 @@ using UnityEngine;
 
 namespace Omnilatent.AdsMediation.IronSourceHelper
 {
-    public enum AdObjectState
-    {
-        None = 0, Loading, Ready, Showing, Shown, Closed, LoadFailed, ShowFailed
-    }
-
     public partial class IronSourceAdsManager : MonoBehaviour, IAdsNetworkHelper
     {
         bool initialized = false;
