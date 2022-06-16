@@ -93,7 +93,6 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 
         public void RequestInterstitialNoShow(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdLoaded = null, bool showLoading = true)
         {
-            Debug.Log($"Iron source request ad {placementType}");
             if (currentInterstitialAd != null && currentInterstitialAd.CanShow)
             {
                 onAdLoaded?.Invoke(true);
@@ -105,7 +104,6 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 
         public void ShowInterstitial(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdClosed)
         {
-            Debug.Log($"Iron source show ad {placementType}");
             if (currentInterstitialAd != null && currentInterstitialAd.CanShow)
             {
                 string placementName = IronSourceAdID.GetAdID(placementType);
@@ -124,7 +122,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 GetCurrentInterAd().State = AdObjectState.Ready;
                 GetCurrentInterAd().onAdLoaded?.Invoke(true);
                 onInterstitialAdReadyEvent?.Invoke(GetCurrentInterAd().AdPlacementType);
-                Debug.Log($"Iron source ad ready {GetCurrentInterAd().AdPlacementType}");
+                //.Log($"Iron source ad ready {GetCurrentInterAd().AdPlacementType}");
             });
         }
 

@@ -59,7 +59,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 yield return delay;
                 tryTimes++;
             }
-            Debug.Log("IronSource reward ad available:" + IronSource.Agent.isRewardedVideoAvailable());
+            //.Log("IronSource reward ad available:" + IronSource.Agent.isRewardedVideoAvailable());
 
             if (IronSource.Agent.isRewardedVideoAvailable())
             {
