@@ -54,8 +54,11 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 
         public void HideBanner()
         {
-            IronSource.Agent.hideBanner();
-            GetCurrentBannerAd().State = AdObjectState.Ready;
+            if (currentBannerAd != null)
+            {
+                IronSource.Agent.hideBanner();
+                GetCurrentBannerAd().State = AdObjectState.Ready;
+            }
         }
 
         void InitBannerCallbacks()
