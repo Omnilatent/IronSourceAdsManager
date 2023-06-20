@@ -32,6 +32,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 Destroy(gameObject);
                 return;
             }
+
             Init();
         }
 
@@ -64,11 +65,10 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 string appKey = developerSettings.AndroidAppKey;
 #elif UNITY_IOS
         string appKey = developerSettings.IOSAppKey;
+#else
+                string appKey = developerSettings.AndroidAppKey;
 #endif
-                if (appKey.Equals(string.Empty))
-                {
-                    Debug.LogWarning("IronSourceInitilizer Cannot init without AppKey");
-                }
+                if (appKey.Equals(string.Empty)) { Debug.LogWarning("IronSourceInitilizer Cannot init without AppKey"); }
                 else
                 {
                     IronSource.Agent.init(appKey);
@@ -88,6 +88,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                     currentInterstitialAd = new InterstitialAdObject();
                 }
             }
+
             return currentInterstitialAd;
         }
 
@@ -98,6 +99,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 onAdLoaded?.Invoke(true);
                 return;
             }
+
             currentInterstitialAd = new InterstitialAdObject(placementType, onAdLoaded);
             IronSource.Agent.loadInterstitial();
         }
@@ -112,6 +114,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 currentInterstitialAd.State = AdObjectState.Showing;
                 return;
             }
+
             onAdClosed?.Invoke(false);
         }
 
@@ -156,18 +159,12 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
 
         private void InterstitialAdClickedEvent()
         {
-            QueueMainThreadExecution(() =>
-            {
-                onInterstitialAdClickedEvent?.Invoke(GetCurrentInterAd().AdPlacementType);
-            });
+            QueueMainThreadExecution(() => { onInterstitialAdClickedEvent?.Invoke(GetCurrentInterAd().AdPlacementType); });
         }
 
         private void InterstitialAdOpenedEvent()
         {
-            QueueMainThreadExecution(() =>
-            {
-                onInterstitialAdOpenedEvent?.Invoke(GetCurrentInterAd().AdPlacementType);
-            });
+            QueueMainThreadExecution(() => { onInterstitialAdOpenedEvent?.Invoke(GetCurrentInterAd().AdPlacementType); });
         }
 
         private void InterstitialAdClosedEvent()
@@ -185,10 +182,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             onAdLoaded?.Invoke(new RewardResult(RewardResult.Type.LoadFailed, "IronSources: App Open Ad not supported"));
         }
 
-        public void ShowAppOpenAd(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdClosed = null)
-        {
-            onAdClosed?.Invoke(false);
-        }
+        public void ShowAppOpenAd(AdPlacement.Type placementType, AdsManager.InterstitialDelegate onAdClosed = null) { onAdClosed?.Invoke(false); }
 
         public void RequestInterstitialRewardedNoShow(AdPlacement.Type placementType, RewardDelegate onAdLoaded = null)
         {
@@ -208,7 +202,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 action.Invoke();
             });
 #else
-        action.Invoke();
+            action.Invoke();
 #endif
         }
     }
