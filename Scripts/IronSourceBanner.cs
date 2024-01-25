@@ -61,6 +61,15 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             }
         }
 
+        public void DestroyBanner()
+        {
+            if (currentBannerAd != null)
+            {
+                IronSource.Agent.destroyBanner();
+                currentBannerAd = null;
+            }
+        }
+
         void InitBannerCallbacks()
         {
             IronSourceEvents.onBannerAdLoadedEvent += BannerAdLoadedEvent;
