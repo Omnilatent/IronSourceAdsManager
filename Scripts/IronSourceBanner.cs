@@ -46,7 +46,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
                 }
                 IronSourceBannerSize ironSourceBannerSize = new IronSourceBannerSize("BANNER");
                 ironSourceBannerSize.SetAdaptive(true);
-                currentBannerAd = new BannerAdObject(placementType, onAdLoaded);
+                currentBannerAd = new BannerAdObject(placementType, (success, adObject) => { onAdLoaded?.Invoke(success); });
                 currentBannerAd.State = AdObjectState.Loading;
                 IronSource.Agent.loadBanner(ironSourceBannerSize, ironSourceBannerPosition, IronSourceAdID.GetAdID(placementType));
             }
@@ -85,7 +85,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             QueueMainThreadExecution(() =>
             {
                 GetCurrentBannerAd().State = AdObjectState.Showing;
-                GetCurrentBannerAd().onAdLoaded?.Invoke(true);
+                GetCurrentBannerAd().onAdLoaded?.Invoke(true, GetCurrentBannerAd());
             });
         }
 
@@ -95,7 +95,7 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             {
                 onBannerAdLoadFailedEvent?.Invoke(GetCurrentBannerAd().AdPlacementType, error);
                 GetCurrentBannerAd().State = AdObjectState.LoadFailed;
-                GetCurrentBannerAd().onAdLoaded?.Invoke(false);
+                GetCurrentBannerAd().onAdLoaded?.Invoke(false, GetCurrentBannerAd());
             });
         }
 

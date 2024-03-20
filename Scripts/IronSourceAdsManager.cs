@@ -177,6 +177,8 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             });
         }
 
+        public void RequestRewardAd(AdPlacement.Type placementType, RewardDelegate onFinish) { throw new NotImplementedException(); }
+
         public void RequestAppOpenAd(AdPlacement.Type placementType, RewardDelegate onAdLoaded = null)
         {
             onAdLoaded?.Invoke(new RewardResult(RewardResult.Type.LoadFailed, "IronSources: App Open Ad not supported"));
@@ -205,5 +207,16 @@ namespace Omnilatent.AdsMediation.IronSourceHelper
             action.Invoke();
 #endif
         }
+
+        public void ShowBanner(AdPlacement.Type placementType, BannerTransform bannerTransform, BannerLoadDelegate onAdLoaded = null)
+        {
+            onAdLoaded?.Invoke(false, null);
+        }
+
+        public void HideBanner(AdPlacement.Type placementType)
+        {
+            
+        }
+
     }
 }
